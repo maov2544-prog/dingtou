@@ -57,7 +57,8 @@ public final class AwemeUidReverseProbe {
 
         try (var context = new SpringApplicationBuilder(DingtouApplication.class)
                 .web(WebApplicationType.NONE)
-                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0")) {
+                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0",
+                        "--logging.file.name=target/probe-logs/probe.log")) {
 
             QianchuanClientFactory factory = context.getBean(QianchuanClientFactory.class);
             AwemeUidResolver.AuthorizedAwemeFetcher fetcher = factory.authorizedAwemeFetcher();

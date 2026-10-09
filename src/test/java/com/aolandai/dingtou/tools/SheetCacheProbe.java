@@ -31,7 +31,8 @@ public final class SheetCacheProbe {
         log.info("========== SheetCacheProbe 开始（只读）==========");
         try (var context = new SpringApplicationBuilder(DingtouApplication.class)
                 .web(WebApplicationType.NONE)
-                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0")) {
+                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0",
+                        "--logging.file.name=target/probe-logs/probe.log")) {
 
             DeliverySheetReader reader = context.getBean(DeliverySheetReader.class);
             AccountDictReader accountReader = context.getBean(AccountDictReader.class);

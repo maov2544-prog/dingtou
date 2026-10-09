@@ -1,13 +1,13 @@
 
 package com.aolandai.dingtou.tools;
-import com.aolandai.dingtou.client.QianchuanTokenClient;
+
 
 public class QianchuanTokenTest {
 
     public static void main(String[] args) {
         try {
             String token =
-                    QianchuanTokenClient.getAccessToken();
+                    ProbeTokens.qianchuan();
 
             System.out.println("千川 PC Token 获取成功");
             System.out.println(

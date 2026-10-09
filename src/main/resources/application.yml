@@ -171,9 +171,9 @@ dingtou:
     qianchuan-state: shop_qianchuan
     suixintui-state: shop_suixintui
     # token 缓存时长；逐条任务都换 token 会让一次批量投放变成几百次多余往返
-    token-ttl-minutes: 30
-    connect-timeout-seconds: 15
-    read-timeout-seconds: 30
+    token-ttl-minutes: 300
+    connect-timeout-seconds: 150
+    read-timeout-seconds: 300
     # ==================== 限流与重试 ====================
     # ⚠️ 40100 是【接口全局总频控】（所有开发者共享、平台动态调整），
     #    不存在「固定间隔 100% 不触发」的值 —— 所以这里是「通畅时的起始速度」，
@@ -221,7 +221,17 @@ logging:
   # ⚠️ 老工程全用 System.out.println，业务日志全跑到 WinSW 的 .out.log，application.log 几乎是空的。
   # 本工程用 slf4j + logback，日志落到文件，按级别可查。
   file:
-    name: logs/dingtou.log
+    # ⚠️ 相对路径 = 跟随【工作目录】。WinSW 启动时必须让 workingDirectory 指向项目根目录，
+    #    否则日志会跑到别处（与 data-dir 同一个坑）。换机器/换部署方式时用环境变量覆盖成绝对路径。
+    name: ${DINGTOU_LOG_FILE:logs/dingtou.log}
+  # ⚠️⚠️ 必须显式指定 UTF-8！否则中文日志会变成 `�`（乱码）。
+  #   根因：JDK 17 在中文 Windows 上 file.encoding=GBK（JDK 18+ 才默认 UTF-8），
+  #   而 Spring Boot 的 charset 默认跟随 file.encoding → 中文写进文件就成了替换字符。
+  #   实测：日志里「加了 -Dfile.encoding=UTF-8 的进程」中文正常，
+  #         「没加的（mvn test）」全是 `�` —— 同一个文件里两种表现。
+  charset:
+    file: UTF-8
+    console: UTF-8
   level:
     root: INFO
     com.aolandai.dingtou: INFO

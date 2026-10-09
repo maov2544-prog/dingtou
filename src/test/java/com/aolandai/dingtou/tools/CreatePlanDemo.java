@@ -17,7 +17,7 @@ import com.bytedance.ads.model.QianchuanVideoGetV10FilteringSources;
 import com.bytedance.ads.model.QianchuanVideoGetV10Response;
 import com.bytedance.ads.model.QianchuanVideoGetV10ResponseData;
 import com.bytedance.ads.model.QianchuanVideoGetV10ResponseDataListInner;
-import com.aolandai.dingtou.client.QianchuanTokenClient;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +31,7 @@ import java.util.List;
  *  文档：https://open.oceanengine.com/labels/12/docs/1872485038037385
  *
  *  调用流程：
- *    ⓪ 自动取 Token（复用 client.QianchuanTokenClient）
+ *    ⓪ 自动取 Token（复用 tools.ProbeTokens，内部走生产同一套 HttpTokenProvider）
  *    ① 组装入参（下面「配置区」）
  *    ② 本地校验 + 组装请求体
  *    ③ 打印请求体（DRY_RUN=true）或真实创建计划（DRY_RUN=false）
@@ -242,7 +242,7 @@ public class CreatePlanDemo {
                 + (blankToNull(TITLE) == null ? "，无标题" : "，标题 1 条"));
 
         // ---------- ② 校验 + 组装请求体（dry-run 不需要 token）----------
-        String accessToken = dryRun ? null : QianchuanTokenClient.getAccessToken();
+        String accessToken = dryRun ? null : ProbeTokens.qianchuan();
         QianchuanOverallVideoCreateService service =
                 new QianchuanOverallVideoCreateService(accessToken);
         QianchuanOverallVideoCreateV10Request request;
@@ -352,9 +352,9 @@ public class CreatePlanDemo {
 
     private static void listAuthorizedAweme(long advertiserId, String keyword) throws Exception {
 
-        String token = QianchuanTokenClient.getAccessToken();
+        String token = ProbeTokens.qianchuan();
         if (token == null || token.isBlank()) {
-            System.out.println("❌ 没取到 Access-Token，检查 client/QianchuanTokenClient 的配置");
+            System.out.println("❌ 没取到 Access-Token，检查环境变量 QIANCHUAN_SERVICE_BEARER_TOKEN 是否配好");
             return;
         }
 
@@ -458,9 +458,9 @@ public class CreatePlanDemo {
      */
     private static void listLibraryVideo(long advertiserId, String[] args) throws Exception {
 
-        String token = QianchuanTokenClient.getAccessToken();
+        String token = ProbeTokens.qianchuan();
         if (token == null || token.isBlank()) {
-            System.out.println("❌ 没取到 Access-Token，检查 client/QianchuanTokenClient 的配置");
+            System.out.println("❌ 没取到 Access-Token，检查环境变量 QIANCHUAN_SERVICE_BEARER_TOKEN 是否配好");
             return;
         }
 

@@ -5,7 +5,7 @@ import com.bytedance.ads.api.Oauth2AdvertiserGetApi;
 import com.bytedance.ads.model.Oauth2AdvertiserGetResponse;
 import com.bytedance.ads.model.Oauth2AdvertiserGetResponseData;
 import com.bytedance.ads.model.Oauth2AdvertiserGetResponseDataListInner;
-import com.aolandai.dingtou.client.SuixintuiTokenClient;
+
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
 public class Oauth2AdvertiserTest {
 
     public static void main(String[] args) throws Exception {
-        String token = SuixintuiTokenClient.getAccessToken();
+        String token = ProbeTokens.suixintui();
 
         ApiClient apiClient = new ApiClient();
         apiClient.setBasePath("https://api.oceanengine.com");

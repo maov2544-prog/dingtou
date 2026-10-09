@@ -30,7 +30,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         properties = {
                 "dingtou.auth-token=smoke-test-token-2026",
                 // 幂等流水写到临时目录，别污染工程里的 data/
-                "dingtou.store.data-dir=${java.io.tmpdir}/dingtou-smoke-test"
+                "dingtou.store.data-dir=${java.io.tmpdir}/dingtou-smoke-test",
+                // ⚠️ 日志也隔离 —— 否则 `mvn test` 的日志会混进生产日志 logs/dingtou.log
+                "logging.file.name=target/test-logs/dingtou-smoke-test.log"
         })
 class TaskApiSmokeTest {
 

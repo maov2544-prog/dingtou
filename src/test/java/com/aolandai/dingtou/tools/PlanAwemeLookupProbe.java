@@ -54,7 +54,8 @@ public final class PlanAwemeLookupProbe {
             // ⚠️ auth-token 必须用【命令行参数】注入（.properties(...) 优先级最低，会被 yml 覆盖）
             context = new SpringApplicationBuilder(DingtouApplication.class)
                     .web(WebApplicationType.NONE)
-                    .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0");
+                    .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0",
+                        "--logging.file.name=target/probe-logs/probe.log");
 
             PlanAwemeService service = context.getBean(PlanAwemeService.class);
             log.info("已取得 PlanAwemeService Bean：{}", service.getClass().getName());

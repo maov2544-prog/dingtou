@@ -61,7 +61,8 @@ public final class PlanBuildProbe {
             // ⚠️ auth-token 必须用【命令行参数】注入（.properties() 优先级最低，会被 yml 覆盖）
             context = new SpringApplicationBuilder(DingtouApplication.class)
                     .web(WebApplicationType.NONE)
-                    .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0");
+                    .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0",
+                        "--logging.file.name=target/probe-logs/probe.log");
 
             PlanBuildService service = context.getBean(PlanBuildService.class);
             log.info("已取得 PlanBuildService Bean：{}", service.getClass().getName());

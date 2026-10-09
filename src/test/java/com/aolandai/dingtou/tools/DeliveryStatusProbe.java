@@ -45,7 +45,8 @@ public final class DeliveryStatusProbe {
 
         try (var context = new SpringApplicationBuilder(DingtouApplication.class)
                 .web(WebApplicationType.NONE)
-                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0")) {
+                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0",
+                        "--logging.file.name=target/probe-logs/probe.log")) {
 
             DeliveryStatusChecker checker = context.getBean(DeliveryStatusChecker.class);
             DeliveryStatusResult r = checker.check(referenceDate, true);

@@ -13,7 +13,7 @@ import com.bytedance.ads.model.QianchuanUniPromotionListV10OrderType;
 import com.bytedance.ads.model.QianchuanUniPromotionListV10PageSize;
 import com.bytedance.ads.model.QianchuanUniPromotionListV10Response;
 import com.bytedance.ads.model.QianchuanUniPromotionListV10ResponseDataAdListInner;
-import com.aolandai.dingtou.client.QianchuanTokenClient;
+
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -54,7 +54,7 @@ public final class PlanListPageProbe {
 
         ApiClient client = new ApiClient();
         client.setBasePath(BASE_PATH);
-        client.addDefaultHeader("Access-Token", QianchuanTokenClient.getAccessToken());
+        client.addDefaultHeader("Access-Token", ProbeTokens.qianchuan());
         QianchuanUniPromotionListV10Api api = new QianchuanUniPromotionListV10Api(client);
 
         QianchuanUniPromotionListV10Filtering filtering = new QianchuanUniPromotionListV10Filtering();

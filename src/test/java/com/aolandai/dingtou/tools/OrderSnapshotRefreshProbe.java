@@ -44,7 +44,8 @@ public final class OrderSnapshotRefreshProbe {
 
         try (var context = new SpringApplicationBuilder(DingtouApplication.class)
                 .web(WebApplicationType.NONE)
-                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0")) {
+                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0",
+                        "--logging.file.name=target/probe-logs/probe.log")) {
 
             OrderSnapshotService service = context.getBean(OrderSnapshotService.class);
             OrderSnapshotStore store = context.getBean(OrderSnapshotStore.class);

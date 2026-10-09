@@ -109,6 +109,15 @@
                     <excludes>
                         <exclude>**/tools/**</exclude>
                     </excludes>
+                    <!--
+                      ⚠️⚠️ 必须给测试 JVM 指定 UTF-8！
+                      JDK 17 在中文 Windows 上 file.encoding=GBK（JDK 18+ 才默认 UTF-8），
+                      而 Spring Boot 的 charset 默认跟随 file.encoding
+                      → 测试里写的中文日志会变成 `�`（乱码）。
+                      实测：同一个日志文件里，「加了这些参数的进程」中文正常，
+                            「没加的（mvn test）」全是 `�`。
+                    -->
+                    <argLine>-Dfile.encoding=UTF-8 -Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8</argLine>
                 </configuration>
             </plugin>
         </plugins>

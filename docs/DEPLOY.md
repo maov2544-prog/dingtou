@@ -33,6 +33,7 @@
 | **网络** | 能访问 **`\\192.168.10.253\文件共享rpa\...`** | 《达人巡查配置表》在共享盘上，**不是本机文件** |
 | **Windows 服务账号** | 需能读共享盘、能读 `D:/rpa_workspace/...` | 服务以 LocalSystem 跑时**读不到用户级环境变量**（见 §3） |
 | **磁盘** | `data/` 与 `logs/` 可写 | 幂等流水、台账、日志 |
+| **工作目录** | 必须是项目根目录 | ⚠️ `logs/dingtou.log` 与 `data/` 是**相对路径**，工作目录不对日志/流水会跑到别处 |
 
 ---
 
@@ -91,6 +92,8 @@
 | `dingtou.anomaly.enabled` / `-sheet` | `true` / `异常表.xlsx` 路径 | 「异常表」：记录没办成且非「主动等待」的情况。**服务直接写、追加、带按天备份**；文件不存在会自动创建 |
 | `dingtou.source.targeting-sheet` | 《定向投放登记表》路径 | 含义 = **已经在千川建计划的【达人 × 商品 × 账户】**。命中就用它给的账户查计划（范围收窄到 1 个账户） |
 | `dingtou.aggregate.auto-refresh-orders` / `-throttle-minutes` | `true` / `10` | 投放前自动刷订单快照 + 节流窗口（`planBuild` 是逐条调的，不节流会重复拉） |
+| ⚠️ **JVM 启动参数** | `-Dfile.encoding=UTF-8 -Dstdout.encoding=UTF-8` | **必须加！** JDK 17 在中文 Windows 上 `file.encoding=GBK`（JDK 18+ 才默认 UTF-8），不加则**中文日志全变 `�` 乱码**。已在 `pom.xml` 的 surefire `argLine` 里配好（测试）；**生产启动脚本也要加** |
+| `DINGTOU_LOG_FILE`（环境变量） | `logs/dingtou.log` | 日志文件路径。⚠️ 默认是**相对路径**（跟随工作目录）→ WinSW 里务必让 `workingDirectory` 指向项目根目录，或用这个环境变量给**绝对路径** |
 | `dingtou.source.sheet-cache-seconds` | `300` | 素材表/账户字典的**读取缓存**秒数（以**文件修改时间**为主判据，文件一改就失效）。⚠️ 轮询时 50 个组合会读表 50 次 → 缓存后只读 1 次（实测 `locate()` 从 566ms → 2ms） |
 | `dingtou.source.direct-write` | `true` | ⚠️ **服务直接写素材表**（K 投放类型 / N 投放状态）。开了之后**影刀就不该再写素材表**，否则互相覆盖。写前自动备份 |
 | `dingtou.scheduler.pending-enabled` | `false` | ⚠️ **默认关**！「轮询」总开关：服务自己扫素材表 → 跑投放 → 直写回。开了会**花钱**且和影刀抢写 |
@@ -234,6 +237,7 @@ curl --noproxy '*' -X POST http://127.0.0.1:8080/api/v1/task/kolPlanCostQuery \
 | 现象 | 原因 / 处理 |
 |---|---|
 | **`code=3 未授权: 缺少或错误的 X-Auth-Token 请求头`** | **两边 token 不一致**。① 确认影刀发的值；② 确认服务**实际**认的值（看启动参数，见 §4 —— 命令行参数会压过环境变量）；③ 两边改成同一个 |
+| **日志里中文变成 `�`（乱码）** | ⚠️ **JVM 没加 `-Dfile.encoding=UTF-8`**。JDK 17 在中文 Windows 上默认 `file.encoding=GBK`，而日志 charset 跟随它 → 中文变替换字符。**修**：启动加 `-Dfile.encoding=UTF-8 -Dstdout.encoding=UTF-8`（`application.yml` 已显式设 `logging.charset.file: UTF-8`，但 JVM 参数仍要加） |
 | 日志里 `HttpMediaTypeNotSupportedException: Content-Type 'text/plain...' is not supported` | 影刀默认发 `text/plain`。**已兼容**（`WebConfig` 让 Jackson 也认 `text/plain`），重新部署即可。若仍报，说明 body 不是合法 JSON → 看是否返回 `code=2` |
 | 收到 `code=5 内部错误` 但重试无用 | 检查是不是**客户端错误被误报**。`code=5` 才是可重试的；`code=2/3` 重试无意义。若确认是传参问题却收到 `code=5`，把日志里的异常类名反馈给开发 |
 | 启动直接失败，报 `auth-token` 校验 | 环境变量没设或设成了用户级 → 改成**系统级**并重启服务 |

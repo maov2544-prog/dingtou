@@ -1,7 +1,7 @@
 package com.aolandai.dingtou.tools;
 
 import com.aolandai.dingtou.DingtouApplication;
-import com.aolandai.dingtou.client.QianchuanTokenClient;
+
 import com.aolandai.dingtou.dto.sheet.AccountRow;
 import com.aolandai.dingtou.source.AccountDictReader;
 import com.bytedance.ads.ApiClient;
@@ -80,12 +80,13 @@ public final class PlanDiagnoseProbe {
         try {
             context = new SpringApplicationBuilder(DingtouApplication.class)
                     .web(WebApplicationType.NONE)
-                    .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0");
+                    .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0",
+                        "--logging.file.name=target/probe-logs/probe.log");
 
             AccountDictReader accountReader = context.getBean(AccountDictReader.class);
             List<AccountRow> accounts = accountReader.readAll();
 
-            String accessToken = QianchuanTokenClient.getAccessToken();
+            String accessToken = ProbeTokens.qianchuan();
             ApiClient client = new ApiClient();
             client.setBasePath(BASE_PATH);
             client.addDefaultHeader("Access-Token", accessToken);

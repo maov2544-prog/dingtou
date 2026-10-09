@@ -16,7 +16,7 @@ import com.bytedance.ads.model.QianchuanAwemeUniPromotionOrderGetV10ResponseData
 import com.bytedance.ads.model.QianchuanShopAdvertiserListV10Response;
 import com.bytedance.ads.model.QianchuanShopAdvertiserListV10ResponseData;
 import com.bytedance.ads.model.QianchuanShopAdvertiserListV10ResponseDataAdvIdListInner;
-import com.aolandai.dingtou.client.SuixintuiTokenClient;
+
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.Map;
 public class SuixintuiUniOrderProbeTest {
 
     public static void main(String[] args) throws Exception {
-        String token = SuixintuiTokenClient.getAccessToken();
+        String token = ProbeTokens.suixintui();
 
         ApiClient apiClient = new ApiClient();
         apiClient.setBasePath("https://api.oceanengine.com");

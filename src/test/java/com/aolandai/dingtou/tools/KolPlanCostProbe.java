@@ -65,7 +65,8 @@ public final class KolPlanCostProbe {
             //    优先级最低，会被 application.yml 覆盖 → @NotBlank 失败 → 启动直接挂。
             context = new SpringApplicationBuilder(DingtouApplication.class)
                     .web(WebApplicationType.NONE)
-                    .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0");
+                    .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0",
+                        "--logging.file.name=target/probe-logs/probe.log");
 
             KolPlanCostService service = context.getBean(KolPlanCostService.class);
             log.info("已取得 KolPlanCostService Bean：{}", service.getClass().getName());

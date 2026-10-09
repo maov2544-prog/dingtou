@@ -1,7 +1,7 @@
 package com.aolandai.dingtou.tools;
 
 import com.aolandai.dingtou.DingtouApplication;
-import com.aolandai.dingtou.client.QianchuanTokenClient;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -70,12 +70,13 @@ public final class AwemeAuthListProbe {
         String baseUrl;
         try (var context = new SpringApplicationBuilder(DingtouApplication.class)
                 .web(WebApplicationType.NONE)
-                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0")) {
+                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0",
+                        "--logging.file.name=target/probe-logs/probe.log")) {
             baseUrl = context.getEnvironment()
                     .getProperty("dingtou.qianchuan.api-base-url", "https://api.oceanengine.com");
         }
 
-        String token = QianchuanTokenClient.getAccessToken();
+        String token = ProbeTokens.qianchuan();
         log.info("已取得 Access-Token（长度 {}）", token.length());
 
         String url = buildUrl(baseUrl, advertiserId, awemeId, awemeShowId);

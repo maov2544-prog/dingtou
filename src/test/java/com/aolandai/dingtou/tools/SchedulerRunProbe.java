@@ -47,6 +47,7 @@ public final class SchedulerRunProbe {
                 // ⚠️ 用命令行参数打开定时开关（优先级最高）；dry-run 仍由 yml 控制
                 .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN,
                         "--server.port=0",
+                        "--logging.file.name=target/probe-logs/probe.log",
                         "--dingtou.scheduler.pending-enabled=true")) {
 
             PendingDeliveryScheduler scheduler = context.getBean(PendingDeliveryScheduler.class);

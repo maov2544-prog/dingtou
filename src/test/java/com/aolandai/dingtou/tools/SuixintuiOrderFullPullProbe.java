@@ -1,6 +1,6 @@
 package com.aolandai.dingtou.tools;
 
-import com.aolandai.dingtou.client.SuixintuiTokenClient;
+
 import com.bytedance.ads.ApiClient;
 import com.bytedance.ads.api.QianchuanAwemeUniPromotionOrderGetV10Api;
 import com.bytedance.ads.model.QianchuanAwemeUniPromotionOrderGetV10Count;
@@ -71,7 +71,7 @@ public final class SuixintuiOrderFullPullProbe {
         log.info("账户 = {}，每页 = {}，页间隔 = {}ms", advertiserId, pageSize, intervalMs);
         log.info("⚠️ 不传时间窗 = 拉全量。若接口拒绝，会自动改用分片模式。");
 
-        String token = SuixintuiTokenClient.getAccessToken();
+        String token = ProbeTokens.suixintui();
         ApiClient apiClient = new ApiClient();
         apiClient.setBasePath("https://api.oceanengine.com");
         apiClient.addDefaultHeader("Access-Token", token);

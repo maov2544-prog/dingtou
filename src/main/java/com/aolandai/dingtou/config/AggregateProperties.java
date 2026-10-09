@@ -68,7 +68,8 @@ public class AggregateProperties {
 
     /** 启动横幅用。 */
     public String describe() {
-        return "预筛口径=" + prescreenScope.name() + "(" + prescreenScope.label() + ")"
+        return "预筛口径=" + prescreenScope.name() + "(" + prescreenScope.label()
+                + "，⚠️已停用，仅排障用)"
                 + "，优先订单快照=" + preferOrderSnapshot
                 + "，预筛缓存=" + prescreenCacheSeconds + " 秒"
                 + "，投放前自动刷订单=" + (autoRefreshOrders

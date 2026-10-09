@@ -46,7 +46,8 @@ public final class ResolveProductByVideoProbe {
 
         try (var context = new SpringApplicationBuilder(DingtouApplication.class)
                 .web(WebApplicationType.NONE)
-                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0")) {
+                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0",
+                        "--logging.file.name=target/probe-logs/probe.log")) {
 
             PlanMaterialResolver resolver = context.getBean(PlanMaterialResolver.class);
             long startedAt = System.currentTimeMillis();

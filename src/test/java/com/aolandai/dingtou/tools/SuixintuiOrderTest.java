@@ -2,7 +2,7 @@ package com.aolandai.dingtou.tools;
 
 import com.bytedance.ads.ApiClient;
 import com.bytedance.ads.model.QianchuanAwemeUniPromotionOrderGetV10ResponseDataOrderListInner;
-import com.aolandai.dingtou.client.SuixintuiTokenClient;
+
 import com.aolandai.dingtou.service.qianchuan.SuixintuiOrderService;
 import com.aolandai.dingtou.service.qianchuan.SuixintuiOrderService.FetchResult;
 
@@ -32,7 +32,7 @@ public class SuixintuiOrderTest {
 
     public static void main(String[] args) throws Exception {
         // ========== 1. 初始化 ==========
-        String token = SuixintuiTokenClient.getAccessToken();
+        String token = ProbeTokens.suixintui();
 
         ApiClient apiClient = new ApiClient();
         apiClient.setBasePath("https://api.oceanengine.com");

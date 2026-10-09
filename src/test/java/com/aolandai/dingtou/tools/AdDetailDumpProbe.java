@@ -1,7 +1,7 @@
 package com.aolandai.dingtou.tools;
 
 import com.aolandai.dingtou.DingtouApplication;
-import com.aolandai.dingtou.client.QianchuanTokenClient;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -67,13 +67,14 @@ public final class AdDetailDumpProbe {
         String baseUrl;
         try (var context = new SpringApplicationBuilder(DingtouApplication.class)
                 .web(WebApplicationType.NONE)
-                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0")) {
+                .run("--dingtou.auth-token=" + PROBE_AUTH_TOKEN, "--server.port=0",
+                        "--logging.file.name=target/probe-logs/probe.log")) {
             baseUrl = context.getEnvironment()
                     .getProperty("dingtou.qianchuan.api-base-url", "https://api.oceanengine.com");
         }
         log.info("接口基址 = {}", baseUrl);
 
-        String token = QianchuanTokenClient.getAccessToken();
+        String token = ProbeTokens.qianchuan();
         log.info("已取得 Access-Token（长度 {}）", token.length());
 
         String url = baseUrl + "/open_api/v1.0/qianchuan/uni_promotion/ad/detail/"
