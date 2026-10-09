@@ -1,0 +1,15 @@
+﻿target/
+build/
+.gradle/
+.idea/
+*.iml
+.vscode/
+*.log
+
+# AI 助手的工作目录（项目记忆、任务记录等），不入版本库
+.workbuddy-ai/
+cp.txt
+*.jsonl
+.env
+.env.*
+!.env.example

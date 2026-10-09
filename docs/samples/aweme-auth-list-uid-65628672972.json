@@ -1,0 +1,27 @@
+{
+  "code" : 0,
+  "message" : "OK",
+  "request_id" : "202610061017101B19E1F5D99447B20F00",
+  "data" : {
+    "authorization_infos" : [ {
+      "auth_range" : "BY_AWEME",
+      "auth_source" : "QIANCHUAN",
+      "auth_status" : "EFFECTIVE",
+      "auth_type" : [ "AWEME_COOPERATOR" ],
+      "aweme_avatar" : "https://p11.douyinpic.com/img/aweme-avatar/tos-cn-avt-0015_5faa4e4cfac682a713ae629c02eac7be~c5_168x168.webp?from=3782654143",
+      "aweme_id" : 65628672972,
+      "aweme_name" : "欧包吖～（有娃版）",
+      "aweme_show_id" : "1003948160",
+      "create_time" : "2026-08-19 14:39:50",
+      "end_time" : "2029-09-29 23:59:59",
+      "is_cancellation_progress" : false,
+      "start_time" : "2026-08-19 14:39:50"
+    } ],
+    "page_info" : {
+      "page" : 1,
+      "page_size" : 100,
+      "total_num" : 1,
+      "total_page" : 1
+    }
+  }
+}

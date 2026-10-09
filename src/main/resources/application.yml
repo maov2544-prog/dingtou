@@ -1,0 +1,231 @@
+server:
+  port: 8080
+  # 与影刀同机部署，只绑回环；如需跨机调用改成 0.0.0.0 并务必设置强 auth-token
+  address: 127.0.0.1
+  shutdown: graceful
+
+spring:
+  application:
+    name: dingtou
+  jackson:
+    # ⚠️ 必须用 non_absent 而不是 non_null：
+    # Optional.empty() 的「值」不是 null，NON_NULL 管不住它，会照样输出 "planName": null。
+    # NON_ABSENT 才会把 Optional.empty() 也视为「不存在」而省略。
+    default-property-inclusion: non_absent
+    time-zone: Asia/Shanghai
+  threads:
+    virtual:
+      enabled: true
+
+dingtou:
+  # ⚠️ 必须配置，否则启动直接失败（服务可被进程外调用，且动作要花钱）
+  # 生产用 Windows 系统环境变量注入；本地调试可临时写死
+  auth-token: ${DINGTOU_AUTH_TOKEN:}
+  # 演练模式：只判定不真实投放。确认无误后再改 false
+  dry-run: true
+
+  source:
+    # 5 张业务表（4 张本地 + 1 张共享盘）。服务与影刀同机部署，所以直接读本地路径。
+    delivery-sheet: D:/rpa_workspace/shuixitui1/26年视频交付表.xlsx
+    # ⚠️ 是否由服务【直接写】素材表（K 投放类型 / N 投放状态）。
+    # 开了之后【影刀就不该再写素材表】，否则两边互相覆盖。
+    # 这是「服务自己定时跑」的前提 —— 不写表的话定时任务结果落不下去。
+    # 写前会自动备份（.backup-yyyyMMdd-HHmmss.xlsx）；被 Excel 打开时如实报错。
+    direct-write: true
+    order-sheet: D:/rpa_workspace/shuixitui1/历史随心推全量订单总表.xlsx
+    account-dict: D:/rpa_workspace/shuixitui1/投放账户信息表.xlsx
+    product-dict: "D:/rpa_workspace/shuixitui1/商品 ID 映射表(1).xlsx"
+    # ⚠️ 达人巡查配置表在【共享盘】上（UNC 路径，不是本机文件）。
+    # 双引号里 \\ 才是单个反斜杠，所以这里写成 4 个反斜杠开头。
+    kol-patrol-config: "\\\\192.168.10.253\\文件共享rpa\\运营部\\短视频商务组\\达人催更\\xml\\达人巡查配置表.xlsx"
+    # sheet 名留空 = 取第一个 sheet。
+    # 定投素材表按月改名（9月视频交付 → 10月视频交付），写死会在下个月直接崩，所以刻意留空。
+    delivery-sheet-name: ""
+    order-sheet-name: ""
+    account-sheet-name: ""
+    product-sheet-name: ""
+    kol-patrol-sheet-name: ""
+
+  # ==================== 任务执行 ====================
+  task:
+    # ⚠️ 0 = 【不转异步】（默认，行为与改造前完全一致）。
+    # 转异步会让「跑得久的任务」返回 code=4 + taskId，要求影刀【支持轮询】。
+    # 所以上线节奏：先部署（保持 0）→ 影刀改完并验证 → 再改成 30000（30 秒）。
+    # 实测耗时：planBuild 34~160s、kolPlanCostQuery 约 245s，都远超影刀默认超时。
+    async-timeout-millis: 0
+    # 后台执行线程数。⚠️ 别调太大 —— 每个后台任务都会真去打千川接口，并发上去更容易撞 40100
+    worker-threads: 4
+
+  store:
+    # ⚠️ 必须是绝对路径：相对路径会随工作目录漂移（WinSW 启动 vs 命令行启动），
+    # 重启后读不到幂等流水 → 「防重复」形同虚设 → 重复建计划（花钱）
+    data-dir: ${DINGTOU_DATA_DIR:D:/program/aolandai/dingtou/data}
+    # 订单快照有效期；超过就认为过期，需要重新拉取
+    order-snapshot-ttl-hours: 24
+
+  aggregate:
+    # ⚠️ 预筛口径会直接改变 N，进而改变 A/B/C 判定 —— 做成配置就是为了「改口径不改代码」
+    #   ALL      = 数该组合在素材表里的全部行（老板 09:32 原话「这个表不用筛选」）
+    #   INVESTED = 只数已投放行（投放类型非空）
+    prescreen-scope: ALL
+    # 是否优先用随心推订单快照（权威）。设 false 则强制走素材表预筛（排障用）
+    prefer-order-snapshot: true
+    # 素材表 4992 行，全量读一遍约 2 秒，而 decide 是逐条调的 —— 必须缓存
+    prescreen-cache-seconds: 300
+
+  kol:
+    # 消耗统计窗口 = 最近 N 个月。窗口是「昨天往前推 N 个月」，
+    # 例如今天 2026-10-04、N=1 → 2026-09-04 ~ 2026-10-03（结束取昨天，当天数据还没跑完）
+    cost-window-months: 1
+    # 《高消耗达人 7 天未更新素材总表》（共享盘）。⚠️ 必须带 IP —— 机器名解析不了。
+    # 用途：「交付状态」检查 —— 读上一周期的计划 ID → 查计划名里的日期 → 写「交付状态」列。
+    delivery-status-sheet: "\\\\192.168.10.253\\文件共享rpa\\运营部\\短视频商务组\\达人催更\\汇总表\\高消耗达人7天未更新素材总表.xlsx"
+    delivery-status-column: 交付状态
+    delivered-value: 已交付
+    not-delivered-value: 未交付
+
+  # 《定向投放登记表》：已经在千川建计划的【达人 × 商品 × 账户】
+  # 处理某组合前先查它，命中就用它给的账户去查计划（范围收窄到 1 个账户）
+  # ⚠️ 3 行复合表头，商品在奇数列（A/C/E/G/I/K/M/O），P 列是「授权状态」不是商品
+  targeting-sheet: "D:/rpa_workspace/shuixitui1/定向投放登记表.xlsx"
+
+  # ==================== 定时任务（老板要的「轮询」）====================
+  # 服务自己扫素材表 → 跑投放 → 直写回，不再依赖影刀 POST 调度。
+  scheduler:
+    # ⚠️ 默认关！开了会【花钱】且会和影刀抢写素材表。
+    # 上线前确认：① 影刀已停 ② dingtou.source.direct-write=true ③ 先 dry-run 观察几轮
+    pending-enabled: false
+    # Spring 6 段式 cron（秒 分 时 日 月 周）。默认每 30 分钟一轮。
+    # ⚠️⚠️ 别调太密！实测【单组合 ≈ 31 秒】（主要是查计划 + 频控退避）
+    #   → 50 个组合一轮要 ≈26 分钟。设成 10 分钟的话会一直重叠空转
+    #   （虽有防重入兜底，但实际周期会变成 26+10=36 分钟，白白多算一轮）。
+    pending-cron: "0 */30 * * * *"
+
+  # ==================== 异常表 ====================
+  # 老板 2026-10-08：流程里「没办成且不是主动等待」的情况要记到一张新 Excel。
+  # 写入方式跟交付状态表一样：服务直接写、追加一行、带备份（按天）。
+  anomaly:
+    enabled: true
+    # ⚠️ 文件不存在会自动创建（带表头）；放共享盘要带 IP（机器名解析不了）
+    sheet: "D:/rpa_workspace/shuixitui1/异常表.xlsx"
+
+  # ==================== A 场景：建随心推 ====================
+  suixintui:
+    # 单位与取值已由官方文档确认（2026-10-05），约束由 SuixintuiConstraints 在启动时自检：
+    #   amount        : 元，[100, 5000000] 且必须是 10 的倍数
+    #   delivery-time : 小时，只能是白名单 2/6/12/24/48/72/96/120/144/168（不是任意小时数！）
+    #   roi-goal      : 支付ROI，[0.01, 10000] 且最多两位小数；
+    #                   ⚠️ 当 marketing_goal=VIDEO_PROM_GOODS 且 bid_type=MANUAL_BID 时【必填】
+    # ⚠️ 配错会在启动时直接失败（@AssertTrue），不会等到花钱那一步才炸。
+    # ⚠️ bid-type 与 roi-goal 是【联动】的：改成 MANUAL_BID 就必须给 roi-goal，否则服务起不来。
+    default-amount: 200          # 单位：元
+    default-delivery-time: 24    # 单位：小时（24 = 1 天）
+    # 出价方式：AUTO_BID / MANUAL_BID；留空 = 不传该字段
+    default-bid-type: MANUAL_BID
+    # 支付 ROI 目标：MANUAL_BID 时必填
+    default-roi-goal: 1.7
+    # 乘方模式：⚠️ 取值是 QCPX_MODE_ON / QCPX_MODE_OFF / QCPX_MODE_DEFAULT（不是 ON/OFF！）
+    # A 场景是「随心推」不是乘方计划，所以默认留空（不传该字段）
+    default-qcpx-mode: ""
+    # 「账户 → 已授权达人列表」缓存秒数（用于把抖音号换成数值 awemeId，避免反复查）
+    aweme-uid-cache-seconds: 600
+
+  # ==================== B / C1 / C2：乘方计划 ====================
+  plan:
+    # 建乘方计划的必填参数（官方要求），我们没有数据来源 → 配在服务端，影刀不用传。
+    # ⚠️ 配错会在启动时直接失败（@AssertTrue），不会等到花钱那一步才炸。
+    default-budget: 20000            # 预算，单位：元（老板 2026-10-05 定）
+    default-roi2-goal: 2             # 支付 ROI 目标，最多两位小数（老板 2026-10-05 定）
+    # 排期方式：⚠️ 取值是 SCHEDULE_FROM_NOW / SCHEDULE_START_END
+    #   （SDK 常量名叫 FROM_NOW / START_END，但接口值是带 SCHEDULE_ 前缀的 —— 别写错）
+    default-video-schedule-type: SCHEDULE_FROM_NOW
+    # 出价方式：乘方目前仅支持 SMART_BID_CUSTOM（控成本投放）
+    default-smart-bid-type: SMART_BID_CUSTOM
+    # 深度转化目标：留空 = 不传，用平台默认（SDK 里只有一个取值，短视频场景是否适用未实测）
+    default-deep-external-action: ""
+    # 智能优惠券：QCPX_MODE_ON / QCPX_MODE_OFF / QCPX_MODE_DEFAULT；留空 = 不传
+    default-qcpx-mode: ""
+    # 创意类型：程序化创意
+    default-creative-type: PROGRAMMATIC_CREATIVE
+    # AIGC 动态创意开关：⚠️ 用 boolean 基本类型 → 每次都会【显式传出去】，行为确定不依赖平台默认
+    # （老板 2026-10-05 确认：保持显式传 false）
+    enable-aigc-creative: false
+    # 乘方-成本项（overall_cost_items）。两个开关都【显式传】，不依赖平台默认。
+    #   星选素材投放：开启后存在星选素材采买任务的商品可自动生效千川星选素材
+    star-task-material-switch: false
+    #   达人带货佣金优化：官方要求「白名单 + marketing_goal=VIDEO_PROM_GOODS + 有号」
+    #   ⚠️ 接口/SDK 里字段拼写是 alliance_commision_switch（少一个 s），别改
+    alliance-commission-switch: false
+    # 查素材池的游标翻页上限（兜底）。⚠️ 别调太小 —— 素材多的达人会被静默截断
+    material-pool-max-rounds: 20
+    # 素材池翻页间隔（毫秒），避免触发 40100
+    material-pool-page-interval-millis: 500
+
+  qianchuan:
+    api-base-url: https://api.oceanengine.com
+    token-url: https://aocilenda.cn/qianchuan/callback
+    # ⚠️ 凭据必须配成【Windows 系统级】环境变量：服务以 LocalSystem 运行时读不到用户级变量。
+    # 值只有 8 字符是正常的 —— 它是换取真 token 的凭据，不是残缺值。
+    bearer-env-var: QIANCHUAN_SERVICE_BEARER_TOKEN
+    # ⚠️ 两套 token 同源不同 state，拿错会一直鉴权失败且很难查
+    qianchuan-state: shop_qianchuan
+    suixintui-state: shop_suixintui
+    # token 缓存时长；逐条任务都换 token 会让一次批量投放变成几百次多余往返
+    token-ttl-minutes: 30
+    connect-timeout-seconds: 15
+    read-timeout-seconds: 30
+    # ==================== 限流与重试 ====================
+    # ⚠️ 40100 是【接口全局总频控】（所有开发者共享、平台动态调整），
+    #    不存在「固定间隔 100% 不触发」的值 —— 所以这里是「通畅时的起始速度」，
+    #    拥堵时 QianchuanThrottle 会自动把间隔翻倍（最多到 max-request-interval-millis）。
+    # 相邻两次对外请求的间隔（千川计划列表 / 计划详情 / 随心推订单 共用）
+    request-interval-millis: 500
+    # 自适应降速的间隔上限：被频控后翻倍，但不会无限涨
+    # ⚠️ 8000 是实测调出来的：2026-10-04 实跑时涨到 3000ms 仍在报 40100（计划列表接口）
+    max-request-interval-millis: 8000
+    # 被频控后单次请求最多重试几次（退避 5s → 10s → 20s → 40s → 60s，含 ±25% 抖动）
+    rate-limit-retries: 5
+    # 单批总等待预算；用尽仍被拦住 → 中止报错（绝不返回残缺结果）
+    # 需 ≥ 重试次数 × 最大退避：5 次最多等 135s，这里留了一倍余量
+    rate-limit-budget-millis: 300000   # ⚠️【单次调用】最大等待（不是整批共享）
+    # 被频控后【首次】退避（之后按 2 倍指数增长：5s → 10s → 20s → 40s → 封顶）
+    rate-limit-initial-backoff-millis: 5000
+    # 退避上限
+    rate-limit-max-backoff-millis: 60000
+    # 是否启用【峰值规避】：整点/半点前 90s 内，等到「过峰 +30s」再重试
+    # 关掉可让重试行为更可预测，但峰期更容易耗光重试次数
+    rate-limit-peak-avoidance: true
+    # 「UID → 抖音号」反查结果的缓存时长（秒）。用途：乘方计划详情接口的 unique_id
+    # （抖音号）有时为空（实测 12.6%），用 aweme_uid 去【抖音号授权列表】反查兜底。
+    aweme-show-id-cache-seconds: 3600
+    # ==================== 查询范围 ====================
+    # 计划列表【翻页上限】（单账户单场景）
+    # ⚠️ 太小会【静默漏数据】：实测某账户单场景有 26 页（2592 个计划），旧上限 20 漏掉 23%
+    max-pages: 100
+    # 查询哪些场景：UNI_PROJECT=全域推广，OVERALL_PROJECT=乘方
+    # ⚠️ 本系统建的是【乘方】计划，两个都要查；【不能配空】（空 = 查不到任何计划，且不报错）
+    query-scenes: UNI_PROJECT,OVERALL_PROJECT
+    # planAwemeLookup 单批上限（详情接口「一计划一次请求」，不能无限批）
+    plan-aweme-max-items: 200
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  # ⚠️ 老工程全用 System.out.println，业务日志全跑到 WinSW 的 .out.log，application.log 几乎是空的。
+  # 本工程用 slf4j + logback，日志落到文件，按级别可查。
+  file:
+    name: logs/dingtou.log
+  level:
+    root: INFO
+    com.aolandai.dingtou: INFO
+  logback:
+    rollingpolicy:
+      max-file-size: 50MB
+      max-history: 30

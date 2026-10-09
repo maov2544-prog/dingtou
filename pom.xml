@@ -1,0 +1,117 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.aolandai</groupId>
+    <artifactId>dingtou</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>dingtou</name>
+    <description>定投素材 → 千川计划 自动化执行器（影刀驱动的 HTTP 任务执行器）</description>
+
+    <properties>
+        <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <oceanengine.sdk.version>1.1.96</oceanengine.sdk.version>
+        <poi.version>5.3.0</poi.version>
+    </properties>
+
+    <repositories>
+        <!-- 千川 OpenAPI SDK 只在字节的私有仓库，Maven Central 没有 -->
+        <repository>
+            <id>OceanengineOpenApi</id>
+            <name>Oceanengine Open API</name>
+            <url>https://artifact.bytedance.com/repository/releases/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- ==================== Web ==================== -->
+        <!-- 内嵌 Tomcat：影刀通过 HTTP 调用本服务 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- /actuator/health：影刀调用前可先探活 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- jakarta validation：配置类的 @AssertTrue 启动自检 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- ==================== 千川 SDK ==================== -->
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>oceanengine-mapi-java-client</artifactId>
+            <version>${oceanengine.sdk.version}</version>
+        </dependency>
+
+        <!-- ==================== JSON ==================== -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- ==================== Excel ====================
+             定投素材表 / 历史随心推订单总表 / 账户字典 / 商品 ID 映射表 都是 .xlsx，
+             必须用 XSSF（poi-ooxml）；只引 poi（HSSF）读不了 .xlsx。
+             老工程 OceanEngine 只用到 .xls，所以只引了 poi —— 这里不能照抄。
+        -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+
+        <!-- ==================== 测试 ==================== -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+          ⚠️ 刻意不引 lombok：本项目与老工程 OceanEngine 一致，全部显式 getter/setter。
+          同事原 pom 里的 lombok 只为已弃用的 plant_search/ 服务。
+        -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!--
+              ⚠️ 手工探针排除：src/test/java/.../tools/ 下是「有 main()、无 @Test」的手工探针
+              （Oauth2AdvertiserTest / QianchuanTokenTest / Suixintui*Test / PlanQueryProbe 等），
+              它们会真调千川接口、只是给人手工 run 的，不是自动化测试。
+              这里按目录排除 **/tools/**，保证它们永远不会被 surefire 当测试跑。
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/tools/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

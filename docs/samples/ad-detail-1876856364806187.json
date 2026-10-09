@@ -1,0 +1,236 @@
+{
+  "code" : 0,
+  "message" : "OK",
+  "request_id" : "2026100609573088AC68E8CF7C0584E18D",
+  "data" : {
+    "ad_id" : 1876856364806187,
+    "adlab_scene" : 1,
+    "aweme_id" : 65628672972,
+    "aweme_infos" : [ {
+      "aweme_name" : "欧包吖～（有娃版）",
+      "aweme_uid" : 65628672972,
+      "unique_id" : ""
+    } ],
+    "create_time" : "2026-09-20 21:08:34",
+    "creative_setting" : {
+      "creative_combine_type" : true,
+      "creative_combine_typelive" : false,
+      "hide_in_aweme" : true
+    },
+    "delivery_setting" : {
+      "alliance_commision_switch" : "OFF",
+      "auto_aweme_material" : false,
+      "budget" : 20000,
+      "budget_mode" : "BUDGET_MODE_DAY",
+      "deep_bid_type" : "MIN",
+      "deep_external_action" : "AD_CONVERT_TYPE_LIVE_PURE_PAY_ROI",
+      "enable_aigc_creative" : false,
+      "end_time" : "2036-09-20",
+      "external_action" : "AD_CONVERT_TYPE_SHOPPING",
+      "is_multi_aweme_uid" : true,
+      "no_aweme_id" : false,
+      "overall_roi_cost_items" : [ 3, 4 ],
+      "pricing_type" : "OCPM",
+      "qcpx_mode" : "QCPX_MODE_ON",
+      "roi2_goal" : 1.94,
+      "smart_bid_type" : "SMART_BID_CUSTOM",
+      "star_task_material_switch" : "OFF",
+      "start_time" : "2026-09-20",
+      "video_schedule_type" : "SCHEDULE_FROM_NOW"
+    },
+    "marketing_goal" : "VIDEO_PROM_GOODS",
+    "modify_time" : "2026-10-03 17:25:31",
+    "multi_product_creative_list" : [ {
+      "aweme_uid" : 65628672972,
+      "block_material" : [ ],
+      "carousel_material" : null,
+      "creative_card" : null,
+      "creative_type" : "PROGRAMMATIC_CREATIVE",
+      "hide_in_aweme" : true,
+      "image_material" : null,
+      "product_channel" : {
+        "channel_id" : 0,
+        "channel_type" : 0
+      },
+      "product_id" : 3593275488396811650,
+      "title_material" : null,
+      "video_material" : [ {
+        "aweme_item_id" : 7631146235525827142,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-p-0015/oMRBMIIGAaRCgyNLeGT7BCAnIynexzQaobGfXG",
+        "video_id" : "v0300fg10000d7jkcjfog65pubq0dd20"
+      }, {
+        "aweme_item_id" : 7632630666740761252,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-p-0015/osASMjEgD3AipiyjbaeY2ePFzMBVABGIaBS06s",
+        "video_id" : "v0300fg10000d7m8p37og65mt1a9kokg"
+      }, {
+        "aweme_item_id" : 7633368548308106387,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-p-0015/o8ENqfgAhCAnX5v4hWuMeleQgHyenDAaYEK2Ju",
+        "video_id" : "v0300fg10000d7nim9fog65qsqgv45a0"
+      }, {
+        "aweme_item_id" : 7635225318621546694,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-p-0015/oE4BuIHE11pAa9jxvGiBBieA9APBGgJDpEfnQx",
+        "video_id" : "v0300fg10000d7qs92fog65l3bt51hd0"
+      }, {
+        "aweme_item_id" : 7636667733694806634,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-p-0015/oMWvO6BHEE6kcwYBu5TB6DNCeI8fGUOfAAmFX7",
+        "video_id" : "v0300fg10000d7te7bvog65t9nsh9q3g"
+      }, {
+        "aweme_item_id" : 7637800508262798955,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-p-0015/okAEFxeegGPg4Ir4ffY6GQ38Ye6tgrsALHIH4X",
+        "video_id" : "v0300fg10000d7velffog65jscn41nn0"
+      }, {
+        "aweme_item_id" : 7639652952027052278,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813/oY2DfcA4QIogKfAEffQHVG8QKghUYdAeAAsLAt",
+        "video_id" : "v0300fg10000d82npv7og65vf85is6gg"
+      }, {
+        "aweme_item_id" : 7641081624473552746,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813/oYeU507ABeGFWVVIGJLaBIAoBeAkQAEzSGAGWA",
+        "video_id" : "v0300fg10000d858v5vog65rgkr96o2g"
+      }, {
+        "aweme_item_id" : 7642180207650021523,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813/oQmGADpIaAFnA6ofAggcjDqmeA9HDAELEQdCAj",
+        "video_id" : "v0300fg10000d877g4nog65sqhj7k740"
+      }, {
+        "aweme_item_id" : 7643339443273843839,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813/owSm1AuAeI2ALDkf6AEA5uB1AMUiiAcUCgyxmC",
+        "video_id" : "v0300fg10000d899hc7og65nq74s1h4g"
+      }, {
+        "aweme_item_id" : 7645343474200886955,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813/oAAAA25ZLCqIfCuAfADbOEiEDGt9EdFgAoTAcu",
+        "video_id" : "v0300fg10000d8crchnog65hjccasglg"
+      }, {
+        "aweme_item_id" : 7648117341172031210,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813c001/oQiKvkuiOAAPBAIASEA7aFJzgjDIJEAwjMi3t",
+        "video_id" : "v0300fg10000d8hp3hnog65vouepgc20"
+      }, {
+        "aweme_item_id" : 7650474619657282539,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813c001/o8BBAUfE5XIEB3F7riQAeJAGi5Af4hyXABVIED",
+        "video_id" : "v0300fg10000d8lv0gfog65s0qmjkg8g"
+      }, {
+        "aweme_item_id" : 7652693469961637823,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813c001/oUI7OFIzIAL1ARGfEAeJL0AGAhEeCAnTB6ZU1B",
+        "video_id" : "v0300fg10000d8pt7j7og65vdep7qoo0"
+      }, {
+        "aweme_item_id" : 7655948212486758342,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813/o8BfMIrQGYdisIZrAIeFAVAAHLbeAoCDBCC2Rf",
+        "video_id" : "v0300fg10000d8vm78fog65ljnlvsir0"
+      }, {
+        "aweme_item_id" : 7658208382621862390,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813c001/owEAQDqf2fcIMZA9y1RqZAFvSAdDtCgAAt4LOC",
+        "video_id" : "v0300fg10000d93mjofog65lpm4829tg"
+      }, {
+        "aweme_item_id" : 7660827004039702227,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-p-0015/o0DBrGUIQfsDkCvuAfGZXfEcFBA7pBorIgDQgE",
+        "video_id" : "v0300fg10000d98bhnvog65lk7ts7cg0"
+      }, {
+        "aweme_item_id" : 7663433259422465770,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813c001/ogAlIjCetSIICYEHQDGzefLeAfVzAA5InE9AQH",
+        "video_id" : "v0300fg10000d9cv12nog65uuf41s21g"
+      }, {
+        "aweme_item_id" : 7666784857641139369,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813/o05la9gMfAEUMIB0ABe1WDCl5iADiAAkCvAIl0",
+        "video_id" : "v0300fg10000d9iu867og65p8ad45v10"
+      }, {
+        "aweme_item_id" : 7671579085449021110,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813/ooqDIt6AADEergAAG2CCfFQiyADdHQom9udghA",
+        "video_id" : "v0300fg10000d9ren97og65ti8td7j2g"
+      }, {
+        "aweme_item_id" : 7673451467416197011,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813c001/ogBiYkd3EryAD1PCa9MBfAYem5AiAAsgAlv1I0",
+        "video_id" : "v0300fg10000d9up4u7og65qe9789030"
+      }, {
+        "aweme_item_id" : 7677241904161795795,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813c001/oMRABCiYtyBAeSgxVvARiULAf9DAC1IAC2EqF1",
+        "video_id" : "v0300fg10000da5gke7og65nm8lmf19g"
+      }, {
+        "aweme_item_id" : 7680864426430078314,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813c001/oUDeXXfLA3g9VFABcs9EAfGXELIB6EyA7TCA9r",
+        "video_id" : "v0300fg10000dabuh9vog65nu2cf4t40"
+      }, {
+        "aweme_item_id" : 7684520183700498943,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813c001/ogAjAf2gBAC1iA6Axki5nQEmUCDIF30g4MeqMA",
+        "video_id" : "v0300fg10000daie9pnog65gj2dcimeg"
+      }, {
+        "aweme_item_id" : 7687111603280312804,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813c001/owG1GiCAiICEggVawuf29AiAeAlW1BDsAAU0Ca",
+        "video_id" : "v0300fg10000dan1k9nog65opio4d6ug"
+      }, {
+        "aweme_item_id" : 7689418293376165284,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813/o4iaTAB1WA1wAsYAix8yCeTCDG2fIUXAAnZgEB",
+        "video_id" : "v0300fg10000dar4nrnog65hbdhc23mg"
+      }, {
+        "aweme_item_id" : 7692346823659636819,
+        "image_mode" : "VIDEO_VERTICAL",
+        "star_traffic" : null,
+        "video_cover_id" : "tos-cn-i-0813/o4I71agC9MexAfGKEAeYLHAGAlQYrAZbBWgV0B",
+        "video_id" : "v0300fg10000db0b77vog65tuhg9isq0"
+      } ]
+    } ],
+    "name" : "欧包吖-护臀膏10.3更新",
+    "opt_status" : "ENABLE",
+    "product_infos" : [ {
+      "channel_id" : null,
+      "channel_type" : null,
+      "product_id" : 3593275488396811650
+    } ],
+    "programmatic_creative_media_list" : {
+      "block_video_material" : [ ],
+      "title_material" : [ ],
+      "video_material" : [ ]
+    },
+    "room_info" : [ ],
+    "status" : "DELIVERY_OK"
+  }
+}
