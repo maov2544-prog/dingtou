@@ -254,5 +254,5 @@ curl --noproxy '*' -X POST http://127.0.0.1:8080/api/v1/task/kolPlanCostQuery \
 | `docs/API-CONTRACT.md` | 影刀对接契约：URL、POST 格式、请求/应答字段、错误码 |
 | `docs/NEXT-PROJECT-ARCHITECTURE.md` | 架构设计与分层 |
 | `docs/NEXT-PROJECT-STRUCTURE.md` | 目录结构与包职责 |
-| `docs/CODE-STYLE-CONFIRM.md` | 代码规范 |
+| `docs/CODE-STYLE.md` | 代码规范 |
 | `docs/NEXT-REQUIREMENT-*.md` | 需求确认 / 计划 / 复用说明 |

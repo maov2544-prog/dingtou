@@ -1,4 +1,8 @@
-# 代码风格确认稿（待老板拍板 · 2026-09-30）
+# 代码风格规范
+
+> ⚠️ 本文原为「待老板拍板稿」（2026-09-30），现已**落地到代码**。
+> 已删掉当时的过程性内容（待拍板项、迁移清单、**已废弃的订单总表方案**）。
+> 剩下的 §1 是**实际在用的风格**，改代码前扫一眼。
 
 > **用途**：迁移 `OceanEngine` 代码前，先把「写出来的代码长什么样」定死，避免迁完再返工。
 > 本文所有「现有风格」条目都**实测自 `D:\program\aolandai\OceanEngine` 的具体文件行号**，
@@ -138,91 +142,19 @@ com.aolandai.oceanengine
 
 ---
 
-## 2. ⚠️ 需要您拍板的 6 个点
+## 2. 本项目额外必须守的几条（踩坑得来）
 
-| # | 问题 | 我的建议 |
-|---|---|---|
-| **①** | **日志**：OceanEngine 全用 `System.out.println`/`printf`。改用 `slf4j` + logback？ | ✅ **改**（架构文档已定）。⚠️ 但会改变排查习惯：以后看 `application.log` 而不是 `.out.log` |
-| **②** | **Javadoc 详略**：照搬这种「中文超详尽」风格吗？ | ✅ **照搬**。这是这个项目最值钱的资产（坑都写在注释里了）。**但我会精简重复描述**，不为了长而长 |
-| **③** | **`var` 用不用**？ | 建议**限定局部变量**用，字段/参数/返回值一律显式类型（可读性） |
-| **④** | **`record` vs 显式 getter/setter**：分界在哪？ | 建议：**跨层传值 / 不可变值对象用 `record`**；**Spring 配置类必须显式 getter/setter**（Spring 需要 setter 绑定） |
-| **⑤** | **`// ===== 分组 =====` 区块注释**保留吗？ | ✅ 保留，长类里确实好用 |
-| **⑥** | **异常体系**：`RateLimitException extends ApiException`（继承 SDK 的），还是自己建一套？ | ✅ **照搬继承 SDK** —— 这样现有 `withRetry` 的 `catch` 逻辑不用改 |
-
----
-
-## 3. 可复用代码迁移清单
-
-> 路径相对 `D:\program\aolandai\OceanEngine\src\main\java\com\aolandai\oceanengine\`
-
-| # | 源文件 | 目标包 | 处理方式 | 价值 |
-|---|---|---|---|---|
-| 1 | `client/ApiErrors.java` | `client/` | **原样照搬**，只改包名 | ★★★ 三层频控集中判定，**这是最不能少的一件** |
-| 2 | `client/RateLimitException.java` | `client/` | **原样照搬** | ★★★ 频控语义 + `isAccountScoped()` |
-| 3 | `client/QianchuanTokenClient.java` | `client/` | 照搬，环境变量名核对 | ★★★ token 换取 |
-| 4 | `client/SuixintuiTokenClient.java` | `client/` | 照搬 | ★★★ token 换取 |
-| 5 | `service/suixintui/SuixintuiUniOrderByAwemeService.java` | `qianchuan/` | 照搬 + **去掉 `System.out`** | ★★★ **最大复用** —— 已解决「按抖音号查订单」的账户发现 + 客户端过滤链路 |
-| 6 | `service/suixintui/SuixintuiOrderService.java` | `qianchuan/` | 照搬（`discoverBusinessAdvertisers()` 被 5 依赖） | ★★★ 账户自动发现 |
-| 7 | `storage/ReinvestRecordStore.java` | `store/` | **抽成通用 `JsonlStore<T>`** | ★★ 原子写 + 内存索引范式 |
-| 8 | `webhook/WebhookNotificationStore.java` | `store/` | 抽通用 | ★★ 幂等落盘范式 |
-| 9 | `scheduler/SuixintuiReinvestProperties.java` | `config/` | **拆分**成 `DingtouProperties` / `QianchuanProperties` / `SourceProperties` / `TaskProperties` | ★★ `@AssertTrue` 自检 + `describeXxx()` 范式 |
-| 10 | `scheduler/SuixintuiReinvestScheduler.java` | `scheduler/` | **只抽 `FileChannel.tryLock()` 单实例锁**（调度本身不要了） | ★★ 防并发 |
-| 11 | `report/DailyReinvestReportService.java` | `source/` | **只抄 POI 用法**（⚠️ 要换成 `poi-ooxml`） | ★★ Excel 读写 |
-| 12 | `webhook/HttpWebhookSender.java` | `client/` | 抄 HTTP 封装范式（超时/重试/自定义头） | ★ HTTP 调用规范 |
-| 13 | `pom.xml` | 根 | 抄依赖结构，**加 `poi-ooxml`**，**不加 lombok** | ★★ 构建基线 |
-
-**明确不迁**：
-- `domain/ReinvestSafetyGuard` / `SuixintuiReinvestCandidateSelector`（老业务的 ROI 追投规则，与本需求无关）
-- `scheduler/SuixintuiReinvestScheduler` 的 `@Scheduled` 轮询（形态已变）
-- 同事工程的 `plant_search/`（已确认整体弃用）
-
----
-
-## 4. 新建【历史随心推全量订单总表】的表头方案
-
-### 参考表实测（`D:\program\aolandai\date\历史随心推全量订单总表.xlsx`）
-
-| 项 | 值 |
-|---|---|
-| sheet 1 | `抖音` —— **43,878 行订单 × 11 列** |
-| sheet 2 | `查询不到投放商品` —— **空表**（预留的异常区） |
-| 表头 | `订单ID / 商品标题 / 抖音号 / 抖音名 / 投放商品 / 投放账户 / 订单创建时间 / 投放状态 / 消耗 / 净成交ROI / 净成交金额` |
-| ⚠️ 已知问题 | `抖音号` 列**数值+文本混存**（数值 28,828 / 文本 15,050）；`订单创建时间` 是**文本**不是日期 |
-| `投放状态` 取值 | 投放结束 27,371 / 投放完成 10,230 / 投放中 3,821 / 投放终止 2,275 / 计划创建失败 141 / 审核不通过 39 / 未支付超15分钟关闭 1 |
-
-### 我的建议表头（在参考表基础上**加 1 列**）
-
-| 列 | 列名 | 说明 |
-|---|---|---|
-| A | 订单ID | 照搬 |
-| B | 商品标题 | 照搬 |
-| C | 抖音号 | 照搬，⚠️ **统一按文本存**（避免再次混型） |
-| D | 抖音名 | 照搬 |
-| **E** | **商品ID** | 🆕 **建议新增** —— 接口返回里本来就有 `productInfo.productId`（数值主键）；<br>`投放商品` 只有 75 个名称值，靠名称聚合有同名风险 |
-| F | 投放商品 | 照搬（名称） |
-| G | 投放账户 | 照搬 |
-| H | 订单创建时间 | 照搬，⚠️ 建议**存真正的日期时间类型**（参考表存成了文本） |
-| I | 投放状态 | 照搬 |
-| J | 消耗 | 照搬 |
-| K | 净成交ROI | 照搬 |
-| L | 净成交金额 | 照搬 |
-
-sheet 2 建议保留：`查询不到投放商品`（放商品 ID 匹配不到名称的订单，留痕）。
-
-### ⚠️ 两个需要您定的
-
-1. **加不加「商品ID」列？**（我建议加，理由如上）
-2. **新表放哪、叫什么？** 候选：
-   - `D:\program\aolandai\date\历史随心推全量订单总表-v2.xlsx`
-   - `D:\rpa_workspace\shuixitui1\历史随心推全量订单总表.xlsx`（跟素材表放一起）
-   - 工程内 `data/` 下
-
----
-
-## 5. 请确认
-
-1. **§2 的 6 个风格点** —— 逐条给个「行 / 不行」。
-2. **§3 迁移清单** —— 有没有漏的、或不该迁的？
-3. **§4 表头方案** —— 加不加「商品ID」列？新表放哪？
-
-确认完我就开始迁移。
+1. ⚠️ **不用 lombok**；**日志用 slf4j + logback**（老项目用 `System.out.println` → 业务日志跑到 WinSW `.out.log`）。
+2. ⚠️ **SLF4J 占位符只认 `{}`**，不认 `{:<20}`（会被当文本且**顶掉第一个 `{}`**）→ 用 `String.format`。
+   ⚠️ **占位符数量必须与参数数量一致**：多了会把 `{}` 原样打印进日志；少了会顶掉后面的参数。
+   合法例外：`Throwable` 放最后一个参数不算「多余」。
+3. ⚠️ **持久化格式里的派生 getter 必须 `@JsonIgnore`**（`isDone()`/`isOk()` 会被写成属性 →
+   回读 `FAIL_ON_UNKNOWN_PROPERTIES` → **服务起不来**）。
+4. ⚠️ **不要在 `JsonlStore` 基类构造器里调用可覆写方法**（子类字段还没初始化 → NPE）。
+5. ⚠️ **Jackson**：`non_null` 管不住 `Optional.empty()` → 用 **`non_absent`**；
+   `TextNode.canConvertToLong()` **恒 false** → 判断数字字符串用 `isNumber()` + `Long.parseLong(asText())`。
+6. ⚠️ **禁止硬编码**：账户 ID / 抖音号 / 分享链接一律进配置。
+7. ⚠️ **共享盘路径必须带 IP**（机器名解析不了）。
+8. ⚠️ **每包补中文 `package-info.java`**；**拆包必须补 import**（否则编译 100+ 错误）。
+9. ⚠️ **验证编译必须看退出码**，不能只看 `BUILD SUCCESS` ——
+   `mvn compile`/`test-compile`/`test` 都会**假绿**（增量编译跳过了你刚改的东西）。
